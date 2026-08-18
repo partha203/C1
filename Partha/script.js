@@ -10,16 +10,14 @@ menuBtn.addEventListener("click", () => {
 });
 
 
-// Close mobile menu when a link is clicked
+// Close mobile menu when clicking a link
 
 const navItems = document.querySelectorAll(".nav-links a");
 
 navItems.forEach((item) => {
 
     item.addEventListener("click", () => {
-
         navLinks.classList.remove("active");
-
     });
 
 });
@@ -29,20 +27,28 @@ navItems.forEach((item) => {
 // CONTACT FORM
 // =========================
 
-const contactForm = document.getElementById("contactForm");
+const contactForm =
+    document.getElementById("contactForm");
 
 contactForm.addEventListener("submit", (event) => {
 
     event.preventDefault();
 
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const message = document.getElementById("message").value;
+    const name =
+        document.getElementById("name").value;
 
-    if (name === "" || email === "" || message === "") {
+    const email =
+        document.getElementById("email").value;
 
+    const message =
+        document.getElementById("message").value;
+
+    if (
+        name.trim() === "" ||
+        email.trim() === "" ||
+        message.trim() === ""
+    ) {
         alert("Please fill in all fields.");
-
         return;
     }
 
@@ -67,7 +73,7 @@ year.textContent = new Date().getFullYear();
 
 
 // =========================
-// NAVBAR SHADOW ON SCROLL
+// NAVBAR SHADOW
 // =========================
 
 window.addEventListener("scroll", () => {
@@ -77,7 +83,7 @@ window.addEventListener("scroll", () => {
     if (window.scrollY > 50) {
 
         header.style.boxShadow =
-            "0 5px 20px rgba(0, 0, 0, 0.3)";
+            "0 5px 25px rgba(0, 0, 0, 0.35)";
 
     } else {
 
