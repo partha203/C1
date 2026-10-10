@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}My Account{% endblock %}
+{% block page_title %}My Account{% endblock %}
+{% block content %}
+<div class="grid grid-2">
+  <div class="card">
+    <h3>Profile</h3>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+      {% if user.photo %}
+        <img src="{{ url_for('uploaded_file', filename=user.photo) }}" alt="Profile photo"
+             style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid var(--border);">
+      {% else %}
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--primary-light);color:var(--primary);
+                    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;">
+          {{ user.name[0]|upper }}
+        </div>
+      {% endif %}
+      <div>
+        <strong>{{ user.name }}</strong><br>
+        <span class="muted">{{ user.email }} · {{ user.role }}</span>
+      </div>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="form_type" value="profile">
+      <label>Full Name</label>
+      <input type="text" name="name" value="{{ user.name }}" required>
+      <label>Phone</label>
+      <input type="text" name="phone" value="{{ user.phone or '' }}">
+      <label>Profile Photo</label>
+      <input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp">
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px;">Save Profile</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Change Password</h3>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="form_type" value="password">
+      <label>Current Password</label>
+      <input type="password" name="current_password" required>
+      <label>New Password</label>
+      <input type="password" name="new_password" required minlength="4">
+      <label>Confirm New Password</label>
+      <input type="password" name="confirm_password" required minlength="4">
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px;">Change Password</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

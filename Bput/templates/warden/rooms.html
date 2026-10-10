@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Rooms{% endblock %}
+{% block page_title %}Rooms Overview{% endblock %}
+{% block content %}
+<div class="grid grid-3 section">
+  {% for h in hostels %}
+  <div class="card"><h3>{{ h.name }}</h3><p class="muted">Block {{ h.block }} · Capacity {{ h.capacity }}</p></div>
+  {% endfor %}
+</div>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Hostel</th><th>Room No</th><th>Capacity</th><th>Occupied</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for r in rooms %}
+      <tr>
+        <td>{{ r.hostel_name }}</td><td>{{ r.room_number }}</td><td>{{ r.capacity }}</td><td>{{ r.occupied }}</td>
+        <td><span class="badge {{ 'badge-danger' if r.occupied >= r.capacity else 'badge-success' }}">{{ r.status }}</span></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="muted">No rooms configured yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

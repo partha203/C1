@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Leave Requests{% endblock %}
+{% block page_title %}Leave Requests{% endblock %}
+{% block content %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Student</th><th>Type</th><th>From</th><th>To</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody>
+    {% for l in leaves %}
+      <tr>
+        <td>{{ l.student_name }} <span class="muted">({{ l.college_id }})</span></td>
+        <td>{{ l.leave_type }}</td><td>{{ l.start_date }}</td><td>{{ l.end_date }}</td>
+        <td class="wrap">{{ l.reason }}{% if l.document %} — <a href="{{ url_for('uploaded_file', filename=l.document) }}" target="_blank">doc</a>{% endif %}</td>
+        <td>
+          {% if l.status == 'Pending' %}<span class="badge badge-warning">Pending</span>
+          {% elif l.status == 'Approved' %}<span class="badge badge-success">Approved</span>
+          {% else %}<span class="badge badge-danger">Rejected</span>{% endif %}
+        </td>
+        <td>
+          {% if l.status == 'Pending' %}
+          <form method="post" style="display:flex; gap:6px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="leave_id" value="{{ l.id }}">
+            <button type="submit" name="decision" value="Approved" class="btn btn-primary btn-sm">Approve</button>
+            <button type="submit" name="decision" value="Rejected" class="btn btn-danger btn-sm">Reject</button>
+          </form>
+          {% else %}—{% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7" class="muted">No leave requests yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

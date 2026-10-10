@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Assignments{% endblock %}
+{% block page_title %}Assignments{% endblock %}
+{% block content %}
+{% for a in assignments %}
+<div class="card section">
+  <div class="card-title-row">
+    <h3>{{ a.title }}</h3>
+    <span class="badge {{ 'badge-danger' if not a.my_file else 'badge-success' }}">{{ 'Not submitted' if not a.my_file else 'Submitted' }}</span>
+  </div>
+  <p class="muted">{{ a.subject_name }} · {{ a.faculty_name }} · Due {{ a.deadline or 'No deadline' }} · Max marks {{ a.max_marks }}</p>
+  <p>{{ a.description }}</p>
+  {% if a.file_path %}<p><a href="{{ url_for('uploaded_file', filename=a.file_path) }}" target="_blank">📎 Download assignment attachment</a></p>{% endif %}
+
+  {% if a.my_file %}
+    <p>✅ Submitted {{ a.submitted_at }} — <a href="{{ url_for('uploaded_file', filename=a.my_file) }}" target="_blank">View my submission</a></p>
+    {% if a.marks_obtained is not none %}
+      <div class="flash flash-success">Marks: {{ a.marks_obtained }}/{{ a.max_marks }} {% if a.feedback %}— {{ a.feedback }}{% endif %}</div>
+    {% endif %}
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" style="margin-top:12px; max-width:420px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="assignment_id" value="{{ a.id }}">
+    <label>{{ 'Re-submit file' if a.my_file else 'Submit your work' }}</label>
+    <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png,.docx" required>
+    <button type="submit" class="btn btn-primary btn-sm" style="margin-top:8px;">{{ 'Update Submission' if a.my_file else 'Submit' }}</button>
+  </form>
+</div>
+{% else %}
+<div class="empty-state"><div class="empty-icon">📚</div><p>No assignments posted yet.</p></div>
+{% endfor %}
+{% endblock %}

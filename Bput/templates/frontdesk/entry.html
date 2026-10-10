@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Record Entry/Exit{% endblock %}
+{% block page_title %}Record Entry / Exit{% endblock %}
+{% block content %}
+<div class="card" style="max-width:440px;">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>College ID</label>
+    <input type="text" name="college_id" required autofocus placeholder="e.g. TAT-CSE-2026-001">
+    <label>Gate</label>
+    <select name="gate">
+      <option>Main Gate</option><option>Hostel Gate</option><option>Back Gate</option>
+    </select>
+    <label>Type</label>
+    <select name="entry_type" required>
+      <option value="IN">IN</option>
+      <option value="OUT">OUT</option>
+    </select>
+    <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px;">Record</button>
+  </form>
+  {% if result_student %}
+  <div class="flash flash-success" style="margin-top:16px;">Recorded for {{ result_student.name }} ({{ result_student.college_id }})</div>
+  {% endif %}
+</div>
+{% endblock %}

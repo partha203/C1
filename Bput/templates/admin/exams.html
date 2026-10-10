@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Exams{% endblock %}
+{% block page_title %}Examination Management{% endblock %}
+{% block content %}
+<div class="grid" style="grid-template-columns: 1fr 1.4fr; gap:20px;">
+  <div class="card">
+    <h3>Schedule Exam</h3>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Exam Name</label>
+      <input type="text" name="name" required placeholder="e.g. Mid-Semester Exam">
+      <label>Type</label>
+      <select name="exam_type">
+        <option>Internal</option><option>Semester</option><option>Practical</option>
+      </select>
+      <label>Subject</label>
+      <select name="subject_id" required>{% for s in subjects %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select>
+      <label>Section</label>
+      <select name="section_id" required>{% for s in sections %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select>
+      <div class="form-row">
+        <div><label>Date</label><input type="date" name="date" required></div>
+        <div><label>Time</label><input type="time" name="time" required></div>
+      </div>
+      <div class="form-row">
+        <div><label>Room</label><input type="text" name="room"></div>
+        <div><label>Max Marks</label><input type="number" name="max_marks" value="100"></div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px;">Schedule</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3>All Exams</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Subject</th><th>Section</th><th>Date</th><th></th></tr></thead>
+        <tbody>
+        {% for e in exams %}
+          <tr>
+            <td>{{ e.name }}</td><td>{{ e.subject_name }}</td><td>{{ e.section_name }}</td><td>{{ e.date }}</td>
+            <td><a href="{{ url_for('admin.exam_results', eid=e.id) }}" class="btn btn-ghost btn-sm">Results</a></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="muted">No exams scheduled yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

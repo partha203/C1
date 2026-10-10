@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Request #{{ req.id }}{% endblock %}
+{% block page_title %}Request Detail{% endblock %}
+{% block content %}
+<a href="{{ url_for('student.requests_view') }}" class="btn btn-ghost btn-sm" style="margin-bottom:14px;">← Back to requests</a>
+<div class="grid grid-2">
+  <div class="card">
+    <h3>{{ req.title }}</h3>
+    <div class="kv" style="margin-top:10px;">
+      <div>Category</div><div>{{ req.category }}</div>
+      <div>Priority</div><div><span class="badge badge-neutral">{{ req.priority }}</span></div>
+      <div>Status</div><div><span class="badge badge-info">{{ req.status }}</span></div>
+      <div>Assigned to</div><div>{{ req.assigned_to or '—' }}</div>
+      <div>Submitted</div><div>{{ req.created_at }}</div>
+      <div>Last updated</div><div>{{ req.updated_at }}</div>
+    </div>
+    <p style="margin-top:14px;">{{ req.description or 'No description provided.' }}</p>
+    {% if req.photo %}<p><a href="{{ url_for('uploaded_file', filename=req.photo) }}" target="_blank">📷 View attached photo</a></p>{% endif %}
+    {% if req.video %}<p><a href="{{ url_for('uploaded_file', filename=req.video) }}" target="_blank">🎥 View attached video</a></p>{% endif %}
+    {% if req.resolution_note %}<div class="flash flash-success" style="margin-top:14px;">Resolution note: {{ req.resolution_note }}</div>{% endif %}
+  </div>
+  <div class="card">
+    <h3>Status Timeline</h3>
+    <div class="timeline" style="margin-top:14px;">
+      {% for u in updates %}
+      <div class="timeline-item">
+        <div><strong>{{ u.old_status or 'Created' }} → {{ u.new_status }}</strong></div>
+        <div class="muted">{{ u.note or '' }}</div>
+        <div class="timeline-time">{{ u.created_at }} · {{ u.updated_by_name or 'System' }}</div>
+      </div>
+      {% else %}
+      <p class="muted">No status changes yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

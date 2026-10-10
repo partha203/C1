@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Entry History{% endblock %}
+{% block page_title %}Campus Entry / Exit History{% endblock %}
+{% block content %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Date</th><th>Gate</th><th>Type</th><th>Time</th></tr></thead>
+    <tbody>
+    {% for e in entries %}
+      <tr>
+        <td>{{ e.timestamp[:10] }}</td>
+        <td>{{ e.gate }}</td>
+        <td><span class="badge {{ 'badge-success' if e.entry_type == 'IN' else 'badge-neutral' }}">{{ e.entry_type }}</span></td>
+        <td>{{ e.timestamp[11:16] }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="4" class="muted">No entry/exit records yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Exams{% endblock %}
+{% block page_title %}Exams & Results{% endblock %}
+{% block content %}
+<div class="section">
+  <div class="section-title"><h2>Exam Timetable</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Exam</th><th>Subject</th><th>Date</th><th>Time</th><th>Room</th></tr></thead>
+      <tbody>
+      {% for e in upcoming %}
+        <tr><td>{{ e.name }}</td><td>{{ e.subject }}</td><td>{{ e.date }}</td><td>{{ e.time }}</td><td>{{ e.room }}</td></tr>
+      {% else %}
+        <tr><td colspan="5" class="muted">No exams scheduled yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">
+    <h2>Results</h2>
+    {% if overall_pct is not none %}<span class="badge badge-info">Overall: {{ overall_pct }}% · CGPA {{ gpa }}/10</span>{% endif %}
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Exam</th><th>Subject</th><th>Marks</th></tr></thead>
+      <tbody>
+      {% for r in results %}
+        <tr><td>{{ r.exam_name }}</td><td>{{ r.subject }}</td><td>{{ r.marks_obtained if r.marks_obtained is not none else 'Pending' }}/{{ r.max_marks }}</td></tr>
+      {% else %}
+        <tr><td colspan="3" class="muted">No results published yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

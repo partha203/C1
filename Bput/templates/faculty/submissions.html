@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Submissions{% endblock %}
+{% block page_title %}Submissions — {{ assignment.title }}{% endblock %}
+{% block content %}
+<a href="{{ url_for('faculty.assignments') }}" class="btn btn-ghost btn-sm" style="margin-bottom:14px;">← Back</a>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Student</th><th>Roll No</th><th>Submitted</th><th>File</th><th>Marks</th><th>Feedback</th><th></th></tr></thead>
+    <tbody>
+    {% for s in subs %}
+      <tr>
+        <td>{{ s.name }}</td>
+        <td>{{ s.roll_number }}</td>
+        <td>{{ s.submitted_at }}</td>
+        <td><a href="{{ url_for('uploaded_file', filename=s.file_path) }}" target="_blank">View</a></td>
+        <td>
+          <input type="number" name="marks_obtained" form="grade-form-{{ s.id }}"
+                 value="{{ s.marks_obtained if s.marks_obtained is not none else '' }}" style="width:80px;" max="{{ assignment.max_marks }}">
+        </td>
+        <td>
+          <input type="text" name="feedback" form="grade-form-{{ s.id }}" value="{{ s.feedback or '' }}" style="width:160px;">
+        </td>
+        <td>
+          <form id="grade-form-{{ s.id }}" method="post" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="submission_id" value="{{ s.id }}">
+          </form>
+          <button type="submit" form="grade-form-{{ s.id }}" class="btn btn-ghost btn-sm">Save</button>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7" class="muted">No submissions yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

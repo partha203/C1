@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Hostel{% endblock %}
+{% block page_title %}Hostel Management{% endblock %}
+{% block content %}
+<div class="grid grid-3 section">
+  {% for h in hostels %}
+  <div class="card">
+    <h3>{{ h.name }}</h3>
+    <p class="muted">Block {{ h.block }} · Capacity {{ h.capacity }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="grid grid-3 section">
+  <div class="card">
+    <h3>Add Hostel</h3>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add_hostel">
+      <label>Name</label>
+      <input type="text" name="name" required placeholder="e.g. Boys Hostel D">
+      <label>Block</label>
+      <input type="text" name="block" placeholder="e.g. D">
+      <label>Capacity</label>
+      <input type="number" name="capacity" value="100">
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:12px;">Add Hostel</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3>Add Room</h3>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add_room">
+      <label>Hostel</label>
+      <select name="hostel_id" required>{% for h in hostels %}<option value="{{ h.id }}">{{ h.name }}</option>{% endfor %}</select>
+      <label>Room Number</label>
+      <input type="text" name="room_number" required placeholder="e.g. D-101">
+      <label>Capacity</label>
+      <input type="number" name="room_capacity" value="2">
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:12px;">Add Room</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3>Allocate Student to Room</h3>
+    <form method="post" data-confirm="This will move the student out of any existing room and into the selected one. Continue?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="allocate">
+      <label>College ID</label>
+      <input type="text" name="college_id" required placeholder="e.g. TAT-CSE-2026-001">
+      <label>Room</label>
+      <select name="room_id" required>
+        {% for r in rooms %}
+          <option value="{{ r.id }}" {% if r.occupied >= r.capacity %}disabled{% endif %}>
+            {{ r.hostel_name }} · {{ r.room_number }} ({{ r.occupied }}/{{ r.capacity }}{% if r.occupied >= r.capacity %} - Full{% endif %})
+          </option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:12px;">Allocate</button>
+    </form>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Hostel</th><th>Room No</th><th>Capacity</th><th>Occupied</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for r in rooms %}
+      <tr>
+        <td>{{ r.hostel_name }}</td><td>{{ r.room_number }}</td><td>{{ r.capacity }}</td><td>{{ r.occupied }}</td>
+        <td><span class="badge {{ 'badge-danger' if r.occupied >= r.capacity else 'badge-success' }}">{{ r.status }}</span></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="muted">No rooms configured yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

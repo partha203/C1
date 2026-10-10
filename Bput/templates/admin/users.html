@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block page_title %}Manage Users{% endblock %}
+{% block content %}
+<div class="grid" style="grid-template-columns: 1fr 1.6fr; gap:20px;">
+  <div class="card">
+    <h3>Create User</h3>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Full Name</label>
+      <input type="text" name="name" required>
+      <label>Email</label>
+      <input type="email" name="email" required>
+      <label>Phone</label>
+      <input type="text" name="phone">
+      <label>Role</label>
+      <select name="role" required>
+        <option value="student">Student</option>
+        <option value="faculty">Faculty</option>
+        <option value="admin">Admin</option>
+        <option value="warden">Warden</option>
+        <option value="mess">Mess Manager</option>
+        <option value="frontdesk">Front Desk Staff</option>
+      </select>
+      <label>Temporary Password</label>
+      <input type="text" name="password" required minlength="4">
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px;">Create User</button>
+    </form>
+    <p class="muted" style="margin-top:10px; font-size:12px;">Note: creating a student/faculty user here only creates the login account. Link their student/faculty profile record separately if needed for full functionality.</p>
+  </div>
+  <div class="card">
+    <h3>All Users</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+        {% for u in users %}
+          <tr>
+            <td>{{ u.name }}</td><td>{{ u.email }}</td>
+            <td><span class="badge badge-neutral">{{ u.role }}</span></td>
+            <td><span class="badge {{ 'badge-success' if u.is_active else 'badge-danger' }}">{{ 'Active' if u.is_active else 'Disabled' }}</span></td>
+            <td>
+              <form method="post" action="{{ url_for('admin.toggle_user', uid=u.id) }}"
+                    {% if u.is_active %}data-confirm="Disable {{ u.name }}'s account? They won't be able to log in until re-enabled."{% endif %}>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-ghost btn-sm">{{ 'Disable' if u.is_active else 'Enable' }}</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

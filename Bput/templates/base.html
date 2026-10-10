@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" data-lite="{{ 'true' if lite_mode else 'false' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}{{ app_name }}{% endblock %} · {{ app_name }}</title>
+<link rel="manifest" href="{{ url_for('common.manifest') }}">
+<meta name="theme-color" content="#4f46e5">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+</head>
+<body class="{{ 'lite' if lite_mode else '' }}">
+{% if session.user_id %}
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="brand-emoji">🎓</span>
+      <div>
+        <div class="brand-name">{{ app_name }}</div>
+        <div class="brand-tag">{{ tagline }}</div>
+      </div>
+    </div>
+    <nav class="nav">
+      {% set role = session.role %}
+      {% if role == 'student' %}
+        <a href="{{ url_for('student.dashboard') }}" class="{{ 'active' if request.endpoint=='student.dashboard' }}">📊 Dashboard</a>
+        <a href="{{ url_for('student.attendance') }}" class="{{ 'active' if request.endpoint=='student.attendance' }}">🗓️ Attendance</a>
+        <a href="{{ url_for('student.assignments') }}" class="{{ 'active' if request.endpoint=='student.assignments' }}">📚 Assignments</a>
+        <a href="{{ url_for('student.exams') }}" class="{{ 'active' if request.endpoint=='student.exams' }}">📝 Exams &amp; Results</a>
+        <a href="{{ url_for('student.requests_view') }}" class="{{ 'active' if request.endpoint in ['student.requests_view','student.request_detail'] }}">🛠️ Requests</a>
+        <a href="{{ url_for('student.leave') }}" class="{{ 'active' if request.endpoint=='student.leave' }}">🧳 Leave</a>
+        <a href="{{ url_for('student.hostel') }}" class="{{ 'active' if request.endpoint=='student.hostel' }}">🏠 Hostel</a>
+        <a href="{{ url_for('student.mess') }}" class="{{ 'active' if request.endpoint=='student.mess' }}">🍽️ Mess</a>
+        <a href="{{ url_for('student.notices') }}" class="{{ 'active' if request.endpoint=='student.notices' }}">📢 Notices</a>
+        <a href="{{ url_for('student.entry_history') }}" class="{{ 'active' if request.endpoint=='student.entry_history' }}">🚪 Entry History</a>
+        <a href="{{ url_for('student.notifications') }}" class="{{ 'active' if request.endpoint=='student.notifications' }}">🔔 Notifications</a>
+        <a href="{{ url_for('student.assistant') }}" class="{{ 'active' if request.endpoint=='student.assistant' }}">🤖 Campus Assistant</a>
+      {% elif role == 'faculty' %}
+        <a href="{{ url_for('faculty.dashboard') }}" class="{{ 'active' if request.endpoint=='faculty.dashboard' }}">📊 Dashboard</a>
+        <a href="{{ url_for('faculty.attendance') }}" class="{{ 'active' if request.endpoint=='faculty.attendance' }}">✅ Mark Attendance</a>
+        <a href="{{ url_for('faculty.assignments') }}" class="{{ 'active' if request.endpoint in ['faculty.assignments','faculty.submissions'] }}">📚 Assignments</a>
+        <a href="{{ url_for('faculty.timetable') }}" class="{{ 'active' if request.endpoint=='faculty.timetable' }}">🗓️ Timetable</a>
+        <a href="{{ url_for('student.requests_view') }}" class="{{ 'active' if request.endpoint in ['student.requests_view','student.request_detail'] }}">🛠️ Requests</a>
+      {% elif role == 'admin' %}
+        <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if request.endpoint=='admin.dashboard' }}">📊 Command Center</a>
+        <a href="{{ url_for('admin.academics') }}" class="{{ 'active' if request.endpoint=='admin.academics' }}">🏫 Academics</a>
+        <a href="{{ url_for('admin.requests_view') }}" class="{{ 'active' if request.endpoint in ['admin.requests_view','admin.request_detail'] }}">🛠️ Requests</a>
+        <a href="{{ url_for('admin.attendance') }}" class="{{ 'active' if request.endpoint=='admin.attendance' }}">🗓️ Attendance</a>
+        <a href="{{ url_for('admin.exams') }}" class="{{ 'active' if request.endpoint in ['admin.exams','admin.exam_results'] }}">📝 Exams</a>
+        <a href="{{ url_for('admin.timetable') }}" class="{{ 'active' if request.endpoint=='admin.timetable' }}">🕐 Timetable</a>
+        <a href="{{ url_for('admin.hostel') }}" class="{{ 'active' if request.endpoint=='admin.hostel' }}">🏠 Hostel</a>
+        <a href="{{ url_for('admin.notices') }}" class="{{ 'active' if request.endpoint=='admin.notices' }}">📢 Notices</a>
+        <a href="{{ url_for('admin.users') }}" class="{{ 'active' if request.endpoint=='admin.users' }}">👥 Users</a>
+        <a href="{{ url_for('admin.audit') }}" class="{{ 'active' if request.endpoint=='admin.audit' }}">🧾 Audit Log</a>
+      {% elif role == 'warden' %}
+        <a href="{{ url_for('warden.dashboard') }}" class="{{ 'active' if request.endpoint=='warden.dashboard' }}">📊 Dashboard</a>
+        <a href="{{ url_for('warden.complaints') }}" class="{{ 'active' if request.endpoint in ['warden.complaints','warden.complaint_detail'] }}">🛠️ Complaints</a>
+        <a href="{{ url_for('warden.leave_requests') }}" class="{{ 'active' if request.endpoint=='warden.leave_requests' }}">🧳 Leave Requests</a>
+        <a href="{{ url_for('warden.rooms') }}" class="{{ 'active' if request.endpoint=='warden.rooms' }}">🏠 Rooms</a>
+        <a href="{{ url_for('student.requests_view') }}" class="{{ 'active' if request.endpoint in ['student.requests_view','student.request_detail'] }}">🛠️ Requests</a>
+      {% elif role == 'mess' %}
+        <a href="{{ url_for('mess.dashboard') }}" class="{{ 'active' if request.endpoint=='mess.dashboard' }}">📊 Dashboard</a>
+        <a href="{{ url_for('mess.menu') }}" class="{{ 'active' if request.endpoint=='mess.menu' }}">🍽️ Menu Editor</a>
+        <a href="{{ url_for('mess.feedback') }}" class="{{ 'active' if request.endpoint=='mess.feedback' }}">⭐ Feedback</a>
+        <a href="{{ url_for('mess.complaints') }}" class="{{ 'active' if request.endpoint=='mess.complaints' }}">🛠️ Complaints</a>
+        <a href="{{ url_for('student.requests_view') }}" class="{{ 'active' if request.endpoint in ['student.requests_view','student.request_detail'] }}">🛠️ Requests</a>
+      {% elif role == 'frontdesk' %}
+        <a href="{{ url_for('frontdesk.dashboard') }}" class="{{ 'active' if request.endpoint=='frontdesk.dashboard' }}">📊 Dashboard</a>
+        <a href="{{ url_for('frontdesk.entry') }}" class="{{ 'active' if request.endpoint=='frontdesk.entry' }}">🚪 Record Entry/Exit</a>
+        <a href="{{ url_for('frontdesk.search') }}" class="{{ 'active' if request.endpoint=='frontdesk.search' }}">🔍 Student Lookup</a>
+        <a href="{{ url_for('frontdesk.assist_request') }}" class="{{ 'active' if request.endpoint=='frontdesk.assist_request' }}">🤝 Assisted Request</a>
+        <a href="{{ url_for('student.requests_view') }}" class="{{ 'active' if request.endpoint in ['student.requests_view','student.request_detail'] }}">🛠️ Requests</a>
+      {% endif %}
+      <a href="{{ url_for('common.account') }}" class="{{ 'active' if request.endpoint=='common.account' }}">⚙️ My Account</a>
+    </nav>
+    <form method="post" action="{{ url_for('common.toggle_lite_mode') }}" class="lite-toggle-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="next" value="{{ request.path }}">
+      <button type="submit" class="lite-toggle">{{ '🐢 Lite Mode: ON' if lite_mode else '⚡ Lite Mode: OFF' }}</button>
+    </form>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">☰</button>
+      <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+      <div class="topbar-right">
+        <a href="{{ url_for('common.account') }}" class="user-chip" style="display:flex;align-items:center;gap:8px;color:inherit;">
+          {% if current_user_photo %}
+            <img src="{{ url_for('uploaded_file', filename=current_user_photo) }}" alt=""
+                 style="width:26px;height:26px;border-radius:50%;object-fit:cover;">
+          {% else %}
+            <span style="width:26px;height:26px;border-radius:50%;background:var(--primary-light);color:var(--primary);
+                        display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">{{ session.name[0]|upper }}</span>
+          {% endif %}
+          {{ session.name }} <small>({{ session.role }})</small>
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-sm">Logout</a>
+      </div>
+    </header>
+    <main class="content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+<div class="campus-chat" id="campus-chat">
+  <button class="campus-chat-toggle" id="campus-chat-toggle" type="button"
+          aria-label="Open campus assistant" aria-expanded="false" aria-controls="campus-chat-panel">🤖</button>
+  <section class="campus-chat-panel" id="campus-chat-panel" aria-label="Campus assistant" hidden>
+    <header class="campus-chat-header">
+      <div>
+        <strong>Campus Assistant</strong>
+        <span>Ask a campus question</span>
+      </div>
+      <button class="campus-chat-close" id="campus-chat-close" type="button" aria-label="Close assistant">×</button>
+    </header>
+    <div class="campus-chat-messages" id="campus-chat-messages" role="log" aria-live="polite">
+      <div class="campus-chat-message campus-chat-bot">Hi {{ session.name }}. How can I help?</div>
+    </div>
+    <form class="campus-chat-form" id="campus-chat-form">
+      <input id="campus-chat-input" name="message" type="text" maxlength="2000"
+             placeholder="Write a message..." aria-label="Your message" autocomplete="off" required>
+      <button class="btn btn-primary" id="campus-chat-send" type="submit">Send</button>
+    </form>
+  </section>
+</div>
+{% else %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-stack flash-stack-standalone">
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  {% block guest_content %}{% endblock %}
+{% endif %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% if session.user_id %}
+<script>
+(() => {
+  const toggle = document.getElementById("campus-chat-toggle");
+  const close = document.getElementById("campus-chat-close");
+  const panel = document.getElementById("campus-chat-panel");
+  const form = document.getElementById("campus-chat-form");
+  const input = document.getElementById("campus-chat-input");
+  const send = document.getElementById("campus-chat-send");
+  const messages = document.getElementById("campus-chat-messages");
+  const csrfToken = "{{ csrf_token() }}";
+
+  const setOpen = (isOpen) => {
+    panel.hidden = !isOpen;
+    toggle.setAttribute("aria-expanded", String(isOpen));
+    toggle.setAttribute("aria-label", isOpen ? "Close campus assistant" : "Open campus assistant");
+    if (isOpen) input.focus();
+  };
+
+  const addMessage = (text, kind, extraClass = "") => {
+    const message = document.createElement("div");
+    message.className = `campus-chat-message campus-chat-${kind}`;
+    if (extraClass) message.classList.add(extraClass);
+    message.textContent = text;
+    messages.appendChild(message);
+    messages.scrollTop = messages.scrollHeight;
+    return message;
+  };
+
+  toggle.addEventListener("click", () => setOpen(panel.hidden));
+  close.addEventListener("click", () => setOpen(false));
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const message = input.value.trim();
+    if (!message || send.disabled) return;
+
+    addMessage(message, "user");
+    input.value = "";
+    send.disabled = true;
+    const loading = addMessage("Thinking...", "bot", "campus-chat-loading");
+
+    try {
+      const response = await fetch("{{ url_for('api.ai_chat') }}", {
+        method: "POST",
+        headers: {"Content-Type": "application/json", "X-CSRFToken": csrfToken},
+        body: JSON.stringify({message})
+      });
+      const data = await response.json();
+      loading.remove();
+      if (!response.ok) throw new Error(data.error || "The assistant request failed.");
+      addMessage(data.response || "I didn't receive a response.", "bot");
+    } catch (error) {
+      loading.remove();
+      addMessage(error.message || "Unable to reach the assistant. Please try again.", "bot", "campus-chat-error");
+    } finally {
+      send.disabled = false;
+      input.focus();
+    }
+  });
+})();
+</script>
+{% endif %}
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Campus Assistant{% endblock %}
+{% block page_title %}🤖 Campus Assistant{% endblock %}
+{% block content %}
+<div class="card" style="max-width:600px;">
+  <p class="muted">Ask about your attendance, exams, mess menu, or request status. Works even without any external AI configured.</p>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Your question</label>
+    <input type="text" name="question" required placeholder="e.g. What is my attendance?" value="{{ question or '' }}">
+    <button type="submit" class="btn btn-primary" style="margin-top:12px;">Ask</button>
+  </form>
+  {% if answer %}
+  <div class="chat-bubble">{{ answer }}</div>
+  {% endif %}
+  <div style="margin-top:18px;">
+    <span class="muted">Try:</span>
+    <ul class="muted">
+      <li>What is my attendance?</li>
+      <li>When is my next exam?</li>
+      <li>What's today's mess menu?</li>
+      <li>What is the status of my request?</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

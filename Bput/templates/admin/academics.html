@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Academics{% endblock %}
+{% block page_title %}Academic Management{% endblock %}
+{% block content %}
+<div class="grid grid-2 section">
+  <div class="card">
+    <h3>Departments</h3>
+    <form method="post" style="display:flex; gap:8px; margin-bottom:14px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add_department">
+      <input type="text" name="name" required placeholder="e.g. Information Technology">
+      <button type="submit" class="btn btn-primary btn-sm">Add</button>
+    </form>
+    {% for d in departments %}<div class="list-item"><div>{{ d.name }}</div></div>{% else %}<p class="muted">No departments yet.</p>{% endfor %}
+  </div>
+
+  <div class="card">
+    <h3>Branches</h3>
+    <form method="post" style="margin-bottom:14px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add_branch">
+      <div class="form-row">
+        <input type="text" name="name" required placeholder="Branch name">
+        <input type="text" name="code" required placeholder="Code e.g. IT" maxlength="10">
+      </div>
+      <select name="department_id" required style="margin-top:8px;">
+        {% for d in departments %}<option value="{{ d.id }}">{{ d.name }}</option>{% endfor %}
+      </select>
+      <button type="submit" class="btn btn-primary btn-sm" style="margin-top:8px;">Add Branch</button>
+    </form>
+    {% for b in branches %}<div class="list-item"><div>{{ b.name }} <span class="muted">({{ b.code }})</span></div><span class="badge badge-neutral">{{ b.department_name }}</span></div>{% else %}<p class="muted">No branches yet.</p>{% endfor %}
+  </div>
+</div>
+
+<div class="section">
+  <div class="card">
+    <h3>Faculty</h3>
+    <form method="post" style="margin-bottom:14px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add_faculty">
+      <div class="form-row">
+        <input type="text" name="name" required placeholder="Faculty name">
+        <input type="email" name="email" required placeholder="Email address">
+      </div>
+      <div class="form-row" style="margin-top:8px;">
+        <input type="text" name="employee_id" required placeholder="Employee ID">
+        <input type="text" name="phone" placeholder="Phone">
+      </div>
+      <div class="form-row" style="margin-top:8px;">
+        <select name="department_id" required>
+          {% for d in departments %}<option value="{{ d.id }}">{{ d.name }}</option>{% endfor %}
+        </select>
+        <input type="text" name="designation" placeholder="Designation">
+      </div>
+      <input type="text" name="password" value="faculty123" placeholder="Temporary password" style="margin-top:8px;">
+      <button type="submit" class="btn btn-primary btn-sm" style="margin-top:8px;">Add Faculty</button>
+    </form>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Employee ID</th><th>Department</th><th>Designation</th></tr></thead>
+        <tbody>
+        {% for f in faculty %}
+          <tr><td>{{ f.name }}</td><td>{{ f.email }}</td><td>{{ f.employee_id }}</td><td>{{ f.department_name or '—' }}</td><td>{{ f.designation or '—' }}</td></tr>
+        {% else %}
+          <tr><td colspan="5" class="muted">No faculty members yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-2 section">
+  <div class="card">
+    <h3>Subjects</h3>
+    <form method="post" style="margin-bottom:14px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add_subject">
+      <div class="form-row">
+        <input type="text" name="name" required placeholder="Subject name">
+        <input type="text" name="code" required placeholder="Code e.g. CSE601">
+      </div>
+      <div class="form-row" style="margin-top:8px;">
+        <select name="branch_id" required>{% for b in branches %}<option value="{{ b.id }}">{{ b.code }}</option>{% endfor %}</select>
+        <input type="number" name="semester" required placeholder="Semester" min="1" max="8">
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm" style="margin-top:8px;">Add Subject</button>
+    </form>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Code</th><th>Name</th><th>Branch</th><th>Sem</th></tr></thead>
+        <tbody>
+        {% for s in subjects %}
+          <tr><td>{{ s.code }}</td><td>{{ s.name }}</td><td>{{ s.branch_code }}</td><td>{{ s.semester }}</td></tr>
+        {% else %}
+          <tr><td colspan="4" class="muted">No subjects yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Sections</h3>
+    <form method="post" style="margin-bottom:14px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add_section">
+      <input type="text" name="name" required placeholder="Section name e.g. CSE-4A">
+      <div class="form-row" style="margin-top:8px;">
+        <select name="branch_id" required>{% for b in branches %}<option value="{{ b.id }}">{{ b.code }}</option>{% endfor %}</select>
+        <input type="number" name="year" required placeholder="Year" min="1" max="4">
+      </div>
+      <input type="number" name="semester" required placeholder="Semester" min="1" max="8" style="margin-top:8px;">
+      <button type="submit" class="btn btn-primary btn-sm" style="margin-top:8px;">Add Section</button>
+    </form>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Branch</th><th>Year</th><th>Sem</th></tr></thead>
+        <tbody>
+        {% for s in sections %}
+          <tr><td>{{ s.name }}</td><td>{{ s.branch_code }}</td><td>{{ s.year }}</td><td>{{ s.semester }}</td></tr>
+        {% else %}
+          <tr><td colspan="4" class="muted">No sections yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title"><h2>Faculty–Subject Mapping</h2></div>
+  <p class="muted" style="margin-top:-6px; margin-bottom:10px;">This fills in automatically whenever a timetable entry is added on the Timetable page.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Faculty</th><th>Subject</th><th>Section</th></tr></thead>
+      <tbody>
+      {% for m in mappings %}
+        <tr><td>{{ m.faculty_name }}</td><td>{{ m.subject_name }}</td><td>{{ m.section_name }}</td></tr>
+      {% else %}
+        <tr><td colspan="3" class="muted">No mappings yet — add a timetable entry to create one.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

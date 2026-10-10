@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Complaints{% endblock %}
+{% block page_title %}Hostel Complaints{% endblock %}
+{% block content %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Title</th><th>Student</th><th>Priority</th><th>Status</th><th>SLA</th><th>Date</th></tr></thead>
+    <tbody>
+    {% for r in requests %}
+      <tr onclick="window.location='{{ url_for('warden.complaint_detail', rid=r.id) }}'" style="cursor:pointer">
+        <td>{{ r.title }}</td><td>{{ r.student_name }} <span class="muted">({{ r.college_id }})</span></td>
+        <td><span class="badge badge-neutral">{{ r.priority }}</span></td>
+        <td><span class="badge badge-info">{{ r.status }}</span></td>
+        <td>{% if r.sla.overdue %}<span class="badge badge-danger">Overdue</span>{% else %}<span class="badge badge-success">On track</span>{% endif %}</td>
+        <td>{{ r.created_at[:10] }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="muted">No hostel complaints yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

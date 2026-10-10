@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Menu Editor{% endblock %}
+{% block page_title %}Weekly Menu Editor{% endblock %}
+{% block content %}
+{% for d in days %}
+<div class="card section">
+  <h3>{{ d }}</h3>
+  <div class="grid grid-4">
+    {% for m in meals %}
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="day_of_week" value="{{ d }}">
+      <input type="hidden" name="meal" value="{{ m }}">
+      <label>{{ m }}</label>
+      <textarea name="items" placeholder="items...">{{ grid[d][m] }}</textarea>
+      <button type="submit" class="btn btn-ghost btn-sm" style="margin-top:8px;">Save {{ m }}</button>
+    </form>
+    {% endfor %}
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Notices{% endblock %}
+{% block page_title %}Notices{% endblock %}
+{% block content %}
+{% for n in notices %}
+<div class="card section">
+  <div class="card-title-row">
+    <h3>{{ n.title }} <span class="badge badge-neutral">{{ n.notice_type }}</span></h3>
+    <span class="muted">{{ n.created_at[:16] }}</span>
+  </div>
+  <p>{{ n.body }}</p>
+  <div style="display:flex; gap:10px; align-items:center;">
+    {% if n.read_at %}
+      <span class="badge badge-success">Read</span>
+    {% else %}
+      <form method="post" action="{{ url_for('student.mark_notice_read', nid=n.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-ghost btn-sm">Mark as read</button>
+      </form>
+    {% endif %}
+    {% if n.requires_ack %}<span class="badge {{ 'badge-success' if n.acknowledged_at else 'badge-warning' }}">{{ 'Acknowledged' if n.acknowledged_at else 'Action Required' }}</span>{% endif %}
+    {% if n.requires_ack and not n.acknowledged_at %}
+      <form method="post" action="{{ url_for('student.acknowledge_notice', nid=n.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-primary btn-sm">Acknowledge</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+{% else %}
+<div class="empty-state"><div class="empty-icon">📢</div><p>No notices yet.</p></div>
+{% endfor %}
+{% endblock %}

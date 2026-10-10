@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Welcome, {{ session.name.split(' ')[0] }} 👋{% endblock %}
+{% block content %}
+<div class="grid grid-2 section">
+  <div class="card">
+    <div class="card-title-row"><h3>📚 Today's Classes</h3></div>
+    {% if classes %}
+      {% for c in classes %}
+      <div class="list-item">
+        <div><strong>{{ c.subject_name }}</strong><br><span class="muted">{{ c.branch_code }} · {{ c.section_name }} · Room {{ c.room }}</span></div>
+        <span class="badge badge-info">{{ c.start_time }}–{{ c.end_time }}</span>
+      </div>
+      {% endfor %}
+    {% else %}<p class="muted">No classes scheduled for today.</p>{% endif %}
+  </div>
+  <div class="card">
+    <div class="card-title-row"><h3>📝 Recent Assignments</h3><a href="{{ url_for('faculty.assignments') }}" class="btn btn-ghost btn-sm">All</a></div>
+    {% if assignments %}
+      {% for a in assignments %}
+      <div class="list-item">
+        <div><strong>{{ a.title }}</strong><br><span class="muted">{{ a.subject_name }}</span></div>
+        <span class="badge badge-neutral">{{ a.submitted_count }} submitted</span>
+      </div>
+      {% endfor %}
+    {% else %}<p class="muted">No assignments created yet.</p>{% endif %}
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title"><h2>Quick Actions</h2></div>
+  <div class="grid grid-3">
+    <a class="btn btn-ghost btn-block" href="{{ url_for('faculty.attendance') }}">✅ Mark Attendance</a>
+    <a class="btn btn-ghost btn-block" href="{{ url_for('faculty.assignments') }}">📚 Create Assignment</a>
+    <a class="btn btn-ghost btn-block" href="{{ url_for('faculty.timetable') }}">🗓️ View Timetable</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Notices{% endblock %}
+{% block page_title %}Notices{% endblock %}
+{% block content %}
+<div class="grid" style="grid-template-columns: 1fr 1.4fr; gap:20px;">
+  <div class="card">
+    <h3>Create Notice</h3>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Title</label>
+      <input type="text" name="title" required>
+      <label>Body</label>
+      <textarea name="body" required></textarea>
+      <div class="form-row">
+        <div>
+          <label>Type</label>
+          <select name="notice_type">
+            <option>General</option><option>Academic</option><option>Department</option><option>Branch</option>
+            <option>Year</option><option>Section</option><option>Hostel</option><option>Mess</option><option>Emergency</option>
+          </select>
+        </div>
+        <div>
+          <label>Target Audience</label>
+          <select name="target_audience" id="target_audience" onchange="document.getElementById('target_value_wrap').style.display = this.value === 'Everyone' ? 'none' : 'block';">
+            <option value="Everyone">Everyone</option>
+            <option value="Branch">Branch</option>
+            <option value="Hostel">Hostel</option>
+          </select>
+        </div>
+      </div>
+      <div id="target_value_wrap" style="display:none;">
+        <label>Target Value (branch code or hostel name)</label>
+        <input type="text" name="target_value" list="target_options" placeholder="e.g. CSE or Boys Hostel A">
+        <datalist id="target_options">
+          {% for b in branches %}<option value="{{ b.code }}">{% endfor %}
+          {% for h in hostels %}<option value="{{ h.name }}">{% endfor %}
+        </datalist>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" name="requires_ack" id="requires_ack">
+        <label for="requires_ack" style="margin:0;">Requires acknowledgement</label>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px;">Publish Notice</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3>All Notices</h3>
+    {% for n in notices %}
+    <div class="list-item">
+      <div><strong>{{ n.title }}</strong><br><span class="muted">{{ n.notice_type }} → {{ n.target_audience }}{% if n.target_value %} ({{ n.target_value }}){% endif %}</span></div>
+      <span class="badge badge-neutral">{{ n.created_at[:10] }}</span>
+    </div>
+    {% else %}<p class="muted">No notices yet.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Mark Attendance{% endblock %}
+{% block page_title %}Mark Attendance{% endblock %}
+{% block content %}
+<div class="card" style="margin-bottom:18px;">
+  <form method="get">
+    <div class="form-row">
+      <div>
+        <label>Class (Subject · Section)</label>
+        <select name="class_pick" onchange="
+          var v = this.value.split('|');
+          document.getElementById('subject_id').value = v[0];
+          document.getElementById('section_id').value = v[1];
+          this.form.submit();
+        ">
+          <option value="">— Select —</option>
+          {% for c in my_classes %}
+          <option value="{{ c.subject_id }}|{{ c.section_id }}" {% if c.subject_id == subject_id and c.section_id == section_id %}selected{% endif %}>{{ c.subject_name }} · {{ c.section_name }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" id="subject_id" name="subject_id" value="{{ subject_id or '' }}">
+        <input type="hidden" id="section_id" name="section_id" value="{{ section_id or '' }}">
+      </div>
+      <div>
+        <label>Date</label>
+        <input type="date" name="date" value="{{ date }}" onchange="this.form.submit()">
+      </div>
+    </div>
+  </form>
+</div>
+
+{% if students %}
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="subject_id" value="{{ subject_id }}">
+  <input type="hidden" name="section_id" value="{{ section_id }}">
+  <input type="hidden" name="date" value="{{ date }}">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Roll No</th><th>College ID</th><th>Name</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for s in students %}
+        <tr>
+          <td>{{ s.roll_number }}</td>
+          <td>{{ s.college_id }}</td>
+          <td>{{ s.name }}</td>
+          <td>
+            <label style="display:inline-flex;align-items:center;gap:4px;font-weight:400;margin:0 10px 0 0;">
+              <input type="radio" name="status_{{ s.id }}" value="Present" style="width:auto;" {% if existing.get(s.id, 'Present') == 'Present' %}checked{% endif %}> Present
+            </label>
+            <label style="display:inline-flex;align-items:center;gap:4px;font-weight:400;margin:0;">
+              <input type="radio" name="status_{{ s.id }}" value="Absent" style="width:auto;" {% if existing.get(s.id) == 'Absent' %}checked{% endif %}> Absent
+            </label>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <button type="submit" class="btn btn-primary" style="margin-top:16px;">Save Attendance</button>
+</form>
+{% else %}
+<div class="empty-state"><div class="empty-icon">🗓️</div><p>Select a class and date to mark attendance.</p></div>
+{% endif %}
+{% endblock %}

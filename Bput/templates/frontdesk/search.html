@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Student Lookup{% endblock %}
+{% block page_title %}Student Lookup{% endblock %}
+{% block content %}
+<div class="card" style="max-width:440px; margin-bottom:20px;">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>College ID</label>
+    <input type="text" name="college_id" required autofocus placeholder="e.g. TAT-CSE-2026-001">
+    <button type="submit" class="btn btn-primary btn-block" style="margin-top:12px;">Search</button>
+  </form>
+</div>
+{% if student %}
+<div class="card" style="max-width:500px;">
+  <h3>{{ student.name }}</h3>
+  <div class="kv" style="margin-top:10px;">
+    <div>College ID</div><div>{{ student.college_id }}</div>
+    <div>Roll No</div><div>{{ student.roll_number }}</div>
+    <div>Phone</div><div>{{ student.phone or '—' }}</div>
+    <div>Email</div><div>{{ student.email }}</div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Command Center{% endblock %}
+{% block page_title %}Admin Command Center{% endblock %}
+{% block content %}
+<div class="grid grid-4 section">
+  <div class="card stat-card"><span class="stat-icon">🎓</span><span class="stat-label">Students</span><span class="stat-value">{{ counts.students }}</span></div>
+  <div class="card stat-card"><span class="stat-icon">🧑‍🏫</span><span class="stat-label">Faculty</span><span class="stat-value">{{ counts.faculty }}</span></div>
+  <div class="card stat-card"><span class="stat-icon">🛠️</span><span class="stat-label">Open Requests</span><span class="stat-value">{{ counts.open_requests }}</span><span class="stat-sub">{{ overdue|length }} overdue</span></div>
+  <div class="card stat-card"><span class="stat-icon">🧳</span><span class="stat-label">Pending Leaves</span><span class="stat-value">{{ counts.pending_leaves }}</span></div>
+</div>
+<div class="grid grid-4 section">
+  <div class="card stat-card"><span class="stat-icon">🏠</span><span class="stat-label">Hostel Occupancy</span><span class="stat-value">{{ counts.hostel_occupancy_pct }}%</span></div>
+  <div class="card stat-card"><span class="stat-icon">🚪</span><span class="stat-label">Today's Entries</span><span class="stat-value">{{ counts.today_entries }}</span></div>
+  <div class="card stat-card"><span class="stat-icon">🗓️</span><span class="stat-label">Overall Attendance</span><span class="stat-value">{{ att_pct }}%</span></div>
+  <div class="card stat-card"><span class="stat-icon">📢</span><span class="stat-label">Notices Today</span><span class="stat-value">{{ counts.unread_notices }}</span></div>
+</div>
+
+{% if overdue %}
+<div class="section">
+  <div class="section-title"><h2>⚠️ Overdue Requests</h2><a href="{{ url_for('admin.requests_view') }}" class="btn btn-ghost btn-sm">View all</a></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Title</th><th>Category</th><th>Priority</th><th>Submitted</th></tr></thead>
+      <tbody>
+      {% for r in overdue[:10] %}
+        <tr onclick="window.location='{{ url_for('admin.request_detail', rid=r.id) }}'" style="cursor:pointer">
+          <td>{{ r.title }}</td><td>{{ r.category }}</td>
+          <td><span class="badge badge-danger">{{ r.priority }}</span></td>
+          <td>{{ r.created_at }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<div class="grid grid-3 section">
+  <div class="card">
+    <h3>Requests by Category</h3>
+    <div class="chart-box"><canvas id="chartCategory" height="180"></canvas></div>
+    {% for c in by_category %}<div class="list-item"><div>{{ c.category }}</div><span class="badge badge-neutral">{{ c.c }}</span></div>{% else %}<p class="muted">No data yet.</p>{% endfor %}
+  </div>
+  <div class="card">
+    <h3>Requests by Status</h3>
+    <div class="chart-box"><canvas id="chartStatus" height="180"></canvas></div>
+    {% for c in by_status %}<div class="list-item"><div>{{ c.status }}</div><span class="badge badge-neutral">{{ c.c }}</span></div>{% else %}<p class="muted">No data yet.</p>{% endfor %}
+  </div>
+  <div class="card">
+    <h3>Requests by Priority</h3>
+    <div class="chart-box"><canvas id="chartPriority" height="180"></canvas></div>
+    {% for c in by_priority %}<div class="list-item"><div>{{ c.priority }}</div><span class="badge badge-neutral">{{ c.c }}</span></div>{% else %}<p class="muted">No data yet.</p>{% endfor %}
+  </div>
+</div>
+
+<div class="grid grid-2 section">
+  <div class="card">
+    <h3>Hostel Occupancy</h3>
+    <div class="chart-box"><canvas id="chartHostel" height="160"></canvas></div>
+    <div class="list-item"><div>Occupied</div><span class="badge badge-info">{{ counts.hostel_occupancy_pct }}%</span></div>
+    <div class="list-item"><div>Vacant</div><span class="badge badge-neutral">{{ (100 - counts.hostel_occupancy_pct) | round(1) }}%</span></div>
+  </div>
+  <div class="card">
+    <h3>Overall Attendance</h3>
+    <div class="chart-box"><canvas id="chartAttendance" height="160"></canvas></div>
+    <div class="list-item"><div>Present</div><span class="badge badge-success">{{ att_pct }}%</span></div>
+    <div class="list-item"><div>Absent</div><span class="badge badge-danger">{{ (100 - att_pct) | round(1) }}%</span></div>
+  </div>
+</div>
+
+<div class="grid grid-2 section">
+  <div class="card">
+    <h3>Students Below 75% Attendance</h3>
+    {% for s in below_threshold %}<div class="list-item"><div>{{ s.name }} <span class="muted">({{ s.roll_number }})</span></div><span class="badge badge-danger">{{ s.pct }}%</span></div>{% else %}<p class="muted">No students below threshold.</p>{% endfor %}
+  </div>
+  <div class="card">
+    <h3>🔁 Recurring Issue Detection (last 30 days)</h3>
+    {% for r in recurring %}<div class="list-item"><div>{{ r.category }}</div><span class="badge badge-warning">{{ r.c }} complaints — recurring</span></div>{% else %}<p class="muted">No recurring issue patterns detected.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if not lite_mode %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+(function () {
+  if (typeof Chart === "undefined") return; // offline / CDN unreachable — the lists above still show the data
+
+  var palette = ["#4f46e5", "#16a34a", "#d97706", "#dc2626", "#0891b2", "#9333ea", "#65a30d", "#db2777"];
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = "#6b7280";
+
+  function bar(id, labels, data) {
+    var el = document.getElementById(id);
+    if (!el || !labels.length) return;
+    new Chart(el, {
+      type: "bar",
+      data: { labels: labels, datasets: [{ data: data, backgroundColor: palette }] },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    });
+  }
+  function doughnut(id, labels, data) {
+    var el = document.getElementById(id);
+    if (!el || !labels.length) return;
+    new Chart(el, {
+      type: "doughnut",
+      data: { labels: labels, datasets: [{ data: data, backgroundColor: palette }] },
+      options: { plugins: { legend: { position: "bottom" } } }
+    });
+  }
+
+  bar("chartCategory", {{ by_category | map(attribute='category') | list | tojson }}, {{ by_category | map(attribute='c') | list | tojson }});
+  doughnut("chartStatus", {{ by_status | map(attribute='status') | list | tojson }}, {{ by_status | map(attribute='c') | list | tojson }});
+  bar("chartPriority", {{ by_priority | map(attribute='priority') | list | tojson }}, {{ by_priority | map(attribute='c') | list | tojson }});
+  doughnut("chartHostel", ["Occupied", "Vacant"], [{{ counts.hostel_occupancy_pct }}, {{ (100 - counts.hostel_occupancy_pct) | round(1) }}]);
+  doughnut("chartAttendance", ["Present", "Absent"], [{{ att_pct }}, {{ (100 - att_pct) | round(1) }}]);
+})();
+</script>
+{% endif %}
+{% endblock %}

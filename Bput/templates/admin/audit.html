@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Audit Log{% endblock %}
+{% block page_title %}Audit Log{% endblock %}
+{% block content %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Entity</th><th>Old → New</th></tr></thead>
+    <tbody>
+    {% for l in logs %}
+      <tr>
+        <td>{{ l.created_at }}</td>
+        <td>{{ l.user_name or 'System' }}</td>
+        <td>{{ l.action }}</td>
+        <td>{{ l.entity }}{% if l.entity_id %} #{{ l.entity_id }}{% endif %}</td>
+        <td>{% if l.old_value or l.new_value %}{{ l.old_value or '—' }} → {{ l.new_value or '—' }}{% else %}—{% endif %}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="muted">No audit records yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

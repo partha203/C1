@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Requests{% endblock %}
+{% block page_title %}All Requests{% endblock %}
+{% block content %}
+<style>
+  .floating-btn {
+    position: fixed;
+    right: 28px;
+    bottom: 28px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    line-height: 1;
+    box-shadow: 0 12px 30px rgba(79, 70, 229, 0.35);
+    text-decoration: none;
+    z-index: 50;
+  }
+  .floating-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.96;
+  }
+</style>
+<div class="section-title" style="margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+    <a href="{{ url_for('admin.requests_view') }}" class="btn btn-sm {{ 'btn-primary' if not status_filter else 'btn-ghost' }}">All</a>
+    {% for s in ['Pending','Assigned','In Progress','Resolved','Rejected','Reopened'] %}
+      <a href="{{ url_for('admin.requests_view', status=s) }}" class="btn btn-sm {{ 'btn-primary' if status_filter == s else 'btn-ghost' }}">{{ s }}</a>
+    {% endfor %}
+  </div>
+  <a href="{{ url_for('student.requests_view') }}" class="btn btn-primary btn-sm" aria-label="Add new request" style="display:inline-flex; align-items:center; gap:8px;">
+    <span style="font-size:18px; line-height:1;">+</span> New Request
+  </a>
+</div>
+<a href="{{ url_for('student.requests_view') }}" class="floating-btn" aria-label="Add new request">+</a>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Title</th><th>Student / Reporter</th><th>Category</th><th>Priority</th><th>Status</th><th>SLA</th><th>Assigned</th><th>Submitted</th><th>Action</th></tr></thead>
+    <tbody>
+    {% for r in requests %}
+      <tr onclick="window.location='{{ url_for('admin.request_detail', rid=r.id) }}'" style="cursor:pointer">
+        <td>{{ r.title }}</td>
+        <td>{% if r.student_name %}{{ r.student_name }} <span class="muted">({{ r.college_id }})</span>{% else %}Staff report ({{ r.created_by_role|title }}){% endif %}</td>
+        <td>{{ r.category }}</td>
+        <td><span class="badge badge-neutral">{{ r.priority }}</span></td>
+        <td>
+          {% set map = {'Pending':'warning','Assigned':'info','In Progress':'info','Resolved':'success','Rejected':'danger','Reopened':'danger'} %}
+          <span class="badge badge-{{ map.get(r.status, 'neutral') }}">{{ r.status }}</span>
+        </td>
+        <td>{% if r.sla.overdue %}<span class="badge badge-danger">Overdue</span>{% else %}<span class="badge badge-success">On track</span>{% endif %}</td>
+        <td>{{ r.assigned_to or '—' }}</td>
+        <td>{{ r.created_at[:16] }}</td>
+        <td>
+          <form method="post" action="{{ url_for('admin.delete_request', rid=r.id) }}" onclick="event.stopPropagation()" onsubmit="return confirm('Remove this problem report?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+          </form>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="9" class="muted">No requests found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

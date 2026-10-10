@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Mess Dashboard{% endblock %}
+{% block content %}
+<div class="grid grid-3 section">
+  <div class="card stat-card"><span class="stat-icon">⭐</span><span class="stat-label">Avg Rating</span><span class="stat-value">{{ avg_rating }}/5</span></div>
+  <div class="card stat-card"><span class="stat-icon">💬</span><span class="stat-label">Total Feedback</span><span class="stat-value">{{ feedback_count }}</span></div>
+  <div class="card stat-card"><span class="stat-icon">🛠️</span><span class="stat-label">Open Complaints</span><span class="stat-value">{{ complaints }}</span></div>
+</div>
+
+<div class="grid grid-2 section">
+  <div class="card">
+    <h3>Rating by Meal</h3>
+    <div class="chart-box"><canvas id="chartMeal" height="180"></canvas></div>
+    {% for m in by_meal %}<div class="list-item"><div>{{ m.meal }}</div><span class="badge badge-info">{{ m.avg_rating }}/5 ({{ m.c }})</span></div>{% else %}<p class="muted">No feedback yet.</p>{% endfor %}
+  </div>
+  <div class="card">
+    <h3>Recent Feedback</h3>
+    {% for f in recent_feedback %}
+    <div class="list-item"><div><strong>{{ f.student_name }}</strong> — {{ f.meal }}<br><span class="muted">{{ f.comment or 'No comment' }}</span></div><span class="badge badge-neutral">{{ f.rating }}/5</span></div>
+    {% else %}<p class="muted">No feedback yet.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if not lite_mode %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+(function () {
+  if (typeof Chart === "undefined") return;
+  var el = document.getElementById("chartMeal");
+  if (!el) return;
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = "#6b7280";
+  new Chart(el, {
+    type: "bar",
+    data: {
+      labels: {{ by_meal | map(attribute='meal') | list | tojson }},
+      datasets: [{ data: {{ by_meal | map(attribute='avg_rating') | list | tojson }}, backgroundColor: "#4f46e5" }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 5 } } }
+  });
+})();
+</script>
+{% endif %}
+{% endblock %}

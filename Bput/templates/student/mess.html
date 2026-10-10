@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Mess{% endblock %}
+{% block page_title %}Mess Menu{% endblock %}
+{% block content %}
+<div class="section">
+  <div class="section-title"><h2>Weekly Menu</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Day</th><th>Breakfast</th><th>Lunch</th><th>Snacks</th><th>Dinner</th></tr></thead>
+      <tbody>
+      {% for d in days_order %}
+        <tr {% if d == today_name %}style="background:var(--primary-light);"{% endif %}>
+          <td><strong>{{ d }}</strong>{% if d == today_name %} <span class="badge badge-info">Today</span>{% endif %}</td>
+          {% set items_by_meal = {} %}
+          {% for m in weekly[d] %}{% set _ = items_by_meal.update({m.meal: m.items}) %}{% endfor %}
+          <td class="wrap">{{ items_by_meal.get('Breakfast', '—') }}</td>
+          <td class="wrap">{{ items_by_meal.get('Lunch', '—') }}</td>
+          <td class="wrap">{{ items_by_meal.get('Snacks', '—') }}</td>
+          <td class="wrap">{{ items_by_meal.get('Dinner', '—') }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card" style="max-width:480px;">
+  <h3>Give Mess Feedback</h3>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Meal</label>
+    <select name="meal" required>
+      <option>Breakfast</option><option>Lunch</option><option>Snacks</option><option>Dinner</option>
+    </select>
+    <label>Rating (1–5)</label>
+    <select name="rating" required>
+      <option value="5">5 - Excellent</option>
+      <option value="4">4 - Good</option>
+      <option value="3">3 - Average</option>
+      <option value="2">2 - Below Average</option>
+      <option value="1">1 - Poor</option>
+    </select>
+    <label>Comment (optional — use for issues too)</label>
+    <textarea name="comment" placeholder="Any feedback or food issue..."></textarea>
+    <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px;">Submit Feedback</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Feedback{% endblock %}
+{% block page_title %}Mess Feedback{% endblock %}
+{% block content %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Student</th><th>Meal</th><th>Rating</th><th>Comment</th><th>Date</th></tr></thead>
+    <tbody>
+    {% for f in feedback %}
+      <tr>
+        <td>{{ f.student_name }}</td><td>{{ f.meal }}</td>
+        <td><span class="badge {{ 'badge-success' if f.rating >= 4 else ('badge-warning' if f.rating == 3 else 'badge-danger') }}">{{ f.rating }}/5</span></td>
+        <td class="wrap">{{ f.comment or '—' }}</td>
+        <td>{{ f.created_at[:10] }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="muted">No feedback submitted yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

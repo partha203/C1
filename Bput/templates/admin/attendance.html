@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Attendance Analytics{% endblock %}
+{% block page_title %}Attendance Analytics{% endblock %}
+{% block content %}
+<div class="grid grid-2 section">
+  <div class="card">
+    <h3>By Branch</h3>
+    <div class="chart-box"><canvas id="chartBranch" height="180"></canvas></div>
+    {% for b in by_branch %}<div class="list-item"><div>{{ b.branch }}</div><span class="badge {{ 'badge-danger' if b.pct < 75 else 'badge-success' }}">{{ b.pct }}%</span></div>{% else %}<p class="muted">No data yet.</p>{% endfor %}
+  </div>
+  <div class="card">
+    <h3>By Subject</h3>
+    <div class="chart-box"><canvas id="chartSubject" height="180"></canvas></div>
+    {% for s in by_subject %}<div class="list-item"><div>{{ s.subject }}</div><span class="badge {{ 'badge-danger' if s.pct < 75 else 'badge-success' }}">{{ s.pct }}%</span></div>{% else %}<p class="muted">No data yet.</p>{% endfor %}
+  </div>
+</div>
+<div class="section">
+  <div class="section-title"><h2>Students Below 75%</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Roll No</th><th>Branch</th><th>Attendance</th></tr></thead>
+      <tbody>
+      {% for s in below_threshold %}
+        <tr><td>{{ s.name }}</td><td>{{ s.roll_number }}</td><td>{{ s.branch }}</td><td><span class="badge badge-danger">{{ s.pct }}%</span></td></tr>
+      {% else %}
+        <tr><td colspan="4" class="muted">No students below threshold.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if not lite_mode %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+(function () {
+  if (typeof Chart === "undefined") return;
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = "#6b7280";
+
+  function threshBar(id, labels, data) {
+    var el = document.getElementById(id);
+    if (!el || !labels.length) return;
+    var colors = data.map(function (v) { return v < 75 ? "#dc2626" : "#16a34a"; });
+    new Chart(el, {
+      type: "bar",
+      data: { labels: labels, datasets: [{ data: data, backgroundColor: colors }] },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } }
+    });
+  }
+
+  threshBar("chartBranch", {{ by_branch | map(attribute='branch') | list | tojson }}, {{ by_branch | map(attribute='pct') | list | tojson }});
+  threshBar("chartSubject", {{ by_subject | map(attribute='subject') | list | tojson }}, {{ by_subject | map(attribute='pct') | list | tojson }});
+})();
+</script>
+{% endif %}
+{% endblock %}

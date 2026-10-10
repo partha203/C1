@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% block page_title %}Results — {{ exam.name }}{% endblock %}
+{% block content %}
+<a href="{{ url_for('admin.exams') }}" class="btn btn-ghost btn-sm" style="margin-bottom:14px;">← Back to exams</a>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Roll No</th><th>Name</th><th>Marks (out of {{ exam.max_marks }})</th><th></th></tr></thead>
+    <tbody>
+    {% for s in students %}
+      <tr>
+        <td>{{ s.roll_number }}</td>
+        <td>{{ s.name }}</td>
+        <td>
+          <form method="post" id="result-form-{{ s.id }}" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="student_id" value="{{ s.id }}">
+            <input type="number" name="marks_obtained" value="{{ s.marks_obtained if s.marks_obtained is not none else '' }}" max="{{ exam.max_marks }}" style="width:90px;">
+          </form>
+        </td>
+        <td><button type="submit" form="result-form-{{ s.id }}" class="btn btn-ghost btn-sm">Save</button></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="4" class="muted">No students in this section.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

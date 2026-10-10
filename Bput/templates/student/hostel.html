@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Hostel{% endblock %}
+{% block page_title %}My Hostel{% endblock %}
+{% block content %}
+{% if hostel %}
+<div class="grid grid-2">
+  <div class="card">
+    <h3>🏠 Hostel Information</h3>
+    <div class="kv" style="margin-top:10px;">
+      <div>Hostel</div><div>{{ hostel.name }}</div>
+      <div>Block</div><div>{{ hostel.block or '—' }}</div>
+      <div>Room</div><div>{{ room.room_number if room else '—' }}</div>
+      <div>Room Status</div><div><span class="badge badge-info">{{ room.status if room else '—' }}</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>🛏️ Roommates</h3>
+    {% if roommates %}
+      {% for r in roommates %}
+      <div class="list-item"><div>{{ r.name }}</div><span class="muted">{{ r.roll_number }}</span></div>
+      {% endfor %}
+    {% else %}<p class="muted">No roommates on record.</p>{% endif %}
+  </div>
+</div>
+<div class="section">
+  <a href="{{ url_for('student.requests_view') }}" class="btn btn-primary">Report a Hostel Issue</a>
+</div>
+{% else %}
+<div class="empty-state"><div class="empty-icon">🏠</div><p>No hostel allocation found for your account.</p></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Assisted Request{% endblock %}
+{% block page_title %}Assisted Request (Front Desk){% endblock %}
+{% block content %}
+<div class="card" style="max-width:460px; margin-bottom:20px;">
+  <h3>Step 1: Find Student</h3>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="lookup">
+    <label>College ID</label>
+    <input type="text" name="college_id" required autofocus>
+    <button type="submit" class="btn btn-primary btn-block" style="margin-top:12px;">Find Student</button>
+  </form>
+</div>
+
+{% if student %}
+<div class="card" style="max-width:460px;">
+  <h3>Step 2: Create Request for {{ student.name }}</h3>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="create">
+    <input type="hidden" name="student_id" value="{{ student.id }}">
+    <label>Title</label>
+    <input type="text" name="title" required>
+    <label>Category</label>
+    <select name="category" required>
+      <option>Hostel</option><option>Mess</option><option>Academic</option><option>IT</option>
+      <option>Electrical</option><option>Plumbing</option><option>Maintenance</option><option>Other</option>
+    </select>
+    <label>Priority</label>
+    <select name="priority">
+      <option value="Low">Low</option><option value="Normal" selected>Normal</option>
+      <option value="High">High</option><option value="Urgent">Urgent</option>
+    </select>
+    <label>Description</label>
+    <textarea name="description"></textarea>
+    <button type="submit" class="btn btn-primary btn-block" style="margin-top:12px;">Create Request</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

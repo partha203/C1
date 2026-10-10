@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Leave{% endblock %}
+{% block page_title %}Leave Management{% endblock %}
+{% block content %}
+<div class="grid" style="grid-template-columns: 1fr 1.4fr; gap:20px;">
+  <div class="card">
+    <h3>Apply for Leave</h3>
+    <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Leave Type</label>
+      <select name="leave_type" required>
+        <option>Hostel Leave</option><option>Medical Leave</option><option>Personal Leave</option><option>Academic Leave</option>
+      </select>
+      <div class="form-row">
+        <div><label>Start Date</label><input type="date" name="start_date" required></div>
+        <div><label>End Date</label><input type="date" name="end_date" required></div>
+      </div>
+      <label>Reason</label>
+      <textarea name="reason" required placeholder="Reason for leave..."></textarea>
+      <label>Supporting Document (optional)</label>
+      <input type="file" name="document" accept=".pdf,.jpg,.jpeg,.png,.docx">
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px;">Submit Application</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3>My Leave Applications</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Type</th><th>From</th><th>To</th><th>Reason</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for l in leaves %}
+          <tr>
+            <td>{{ l.leave_type }}</td><td>{{ l.start_date }}</td><td>{{ l.end_date }}</td>
+            <td class="wrap">{{ l.reason or '—' }}</td>
+            <td><span class="badge {{ 'badge-success' if l.status=='Approved' else ('badge-danger' if l.status=='Rejected' else 'badge-warning') }}">{{ l.status }}</span></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="muted">No leave applications yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

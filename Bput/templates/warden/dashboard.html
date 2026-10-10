@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Warden Dashboard{% endblock %}
+{% block content %}
+<div class="grid grid-4 section">
+  <div class="card stat-card"><span class="stat-icon">🎓</span><span class="stat-label">Total Students</span><span class="stat-value">{{ total_students }}</span></div>
+  <div class="card stat-card"><span class="stat-icon">🚪</span><span class="stat-label">Occupied Rooms</span><span class="stat-value">{{ occupied_rooms }}</span></div>
+  <div class="card stat-card"><span class="stat-icon">🛏️</span><span class="stat-label">Vacant Rooms</span><span class="stat-value">{{ vacant_rooms }}</span></div>
+  <div class="card stat-card"><span class="stat-icon">🛠️</span><span class="stat-label">Open Complaints</span><span class="stat-value">{{ open_complaints }}</span></div>
+</div>
+<div class="grid grid-2 section">
+  <div class="card">
+    <h3>Room Occupancy</h3>
+    <div class="chart-box"><canvas id="chartRooms" height="160"></canvas></div>
+    <div class="list-item"><div>Occupied</div><span class="badge badge-info">{{ occupied_rooms }}</span></div>
+    <div class="list-item"><div>Vacant</div><span class="badge badge-neutral">{{ vacant_rooms }}</span></div>
+  </div>
+  <div class="card stat-card"><span class="stat-icon">🧳</span><span class="stat-label">Pending Leave Requests</span><span class="stat-value">{{ pending_leaves }}</span><a href="{{ url_for('warden.leave_requests') }}" class="stat-sub">Review →</a></div>
+</div>
+<div class="section">
+  <div class="section-title"><h2>Recent Hostel Complaints</h2><a href="{{ url_for('warden.complaints') }}" class="btn btn-ghost btn-sm">View all</a></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Title</th><th>Student</th><th>Priority</th><th>Status</th><th>Date</th></tr></thead>
+      <tbody>
+      {% for c in recent_complaints %}
+        <tr onclick="window.location='{{ url_for('warden.complaint_detail', rid=c.id) }}'" style="cursor:pointer">
+          <td>{{ c.title }}</td><td>{{ c.student_name }}</td>
+          <td><span class="badge badge-neutral">{{ c.priority }}</span></td>
+          <td><span class="badge badge-info">{{ c.status }}</span></td>
+          <td>{{ c.created_at[:10] }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5" class="muted">No complaints yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if not lite_mode %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+(function () {
+  if (typeof Chart === "undefined") return;
+  var el = document.getElementById("chartRooms");
+  if (!el) return;
+  new Chart(el, {
+    type: "doughnut",
+    data: {
+      labels: ["Occupied", "Vacant"],
+      datasets: [{ data: [{{ occupied_rooms }}, {{ vacant_rooms }}], backgroundColor: ["#4f46e5", "#e4e7f0"] }]
+    },
+    options: { plugins: { legend: { position: "bottom" } } }
+  });
+})();
+</script>
+{% endif %}
+{% endblock %}

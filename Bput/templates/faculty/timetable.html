@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Timetable{% endblock %}
+{% block page_title %}My Timetable{% endblock %}
+{% block content %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Day</th><th>Time</th><th>Subject</th><th>Section</th><th>Room</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr><td>{{ r.day_of_week }}</td><td>{{ r.start_time }}–{{ r.end_time }}</td><td>{{ r.subject_name }}</td><td>{{ r.section_name }}</td><td>{{ r.room }}</td></tr>
+    {% else %}
+      <tr><td colspan="5" class="muted">No timetable entries yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

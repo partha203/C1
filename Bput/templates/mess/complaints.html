@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Complaints{% endblock %}
+{% block page_title %}Mess Complaints{% endblock %}
+{% block content %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Title</th><th>Student</th><th>Priority</th><th>Status</th><th>Update</th></tr></thead>
+    <tbody>
+    {% for r in requests %}
+      <tr>
+        <td>{{ r.title }}</td><td>{{ r.student_name }}</td>
+        <td><span class="badge badge-neutral">{{ r.priority }}</span></td>
+        <td><span class="badge badge-info">{{ r.status }}</span></td>
+        <td>
+          <form method="post" action="{{ url_for('mess.update_complaint', rid=r.id) }}" style="display:flex; gap:6px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <select name="status" style="width:140px;">
+              {% for s in ['Pending','Assigned','In Progress','Resolved','Rejected'] %}
+                <option value="{{ s }}" {% if r.status == s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+            <input type="text" name="note" placeholder="note" style="width:160px;">
+            <button type="submit" class="btn btn-ghost btn-sm">Save</button>
+          </form>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="muted">No mess complaints yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block guest_content %}
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-brand">
+      <span class="brand-emoji big">🎓</span>
+      <h1>CampusOne</h1>
+      <p class="muted">Attendance, Mess, Hostel, Repeat: Campus Life, Debugged.</p>
+    </div>
+    <form method="post" class="login-form">
+      <label>Email</label>
+      <input type="email" name="email" required autofocus placeholder="you@campus.local">
+      <label>Password</label>
+      <input type="password" name="password" required placeholder="••••••••">
+      <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+    </form>
+    <p class="muted" style="text-align:center;margin:16px 0 0;">New student? <a href="{{ url_for('auth.signup') }}">Create an account</a></p>
+    <details class="demo-creds">
+      <summary>Demo login credentials</summary>
+      <table class="mini-table">
+        <tr><td>Admin</td><td>admin@campus.local</td><td>admin123</td></tr>
+        <tr><td>Student</td><td>student@campus.local</td><td>1234</td></tr>
+        <tr><td>Faculty</td><td>teacher@campus.local</td><td>teacher123</td></tr>
+        <tr><td>Warden</td><td>warden@campus.local</td><td>warden123</td></tr>
+        <tr><td>Mess Manager</td><td>mess@campus.local</td><td>mess123</td></tr>
+        <tr><td>Front Desk</td><td>frontdesk@campus.local</td><td>front123</td></tr>
+      </table>
+    </details>
+  </div>
+</div>
+{% endblock %}
